@@ -5,12 +5,9 @@ import org.geektimes.projects.user.domain.User;
 import java.beans.BeanInfo;
 import java.beans.Introspector;
 import java.beans.PropertyDescriptor;
-import java.io.PrintWriter;
 import java.lang.reflect.Method;
 import java.sql.*;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Properties;
+import java.util.*;
 
 public class DBConnectionManager {
 
@@ -34,22 +31,50 @@ public class DBConnectionManager {
         }
     }
 
-    public static final String DROP_USERS_TABLE_DDL_SQL = "DROP TABLE users";
+    public static final String DATABASE_URL = "jdbc:derby:/db/user-platform;create=true";
+
+    public static final String DROP_USERS_TABLE_DDL_SQL = "DROP TABLE ";
+
+    // ========================= init statements start =========================
 
     public static final String CREATE_USERS_TABLE_DDL_SQL = "CREATE TABLE users(" +
             "id INT NOT NULL PRIMARY KEY GENERATED ALWAYS AS IDENTITY (START WITH 1, INCREMENT BY 1), " +
             "name VARCHAR(16) NOT NULL, " +
             "password VARCHAR(64) NOT NULL, " +
-            "email VARCHAR(64) NOT NULL, " +
-            "phoneNumber VARCHAR(64) NOT NULL" +
+            "email VARCHAR(64) DEFAULT NULL, " +
+            "phoneNumber VARCHAR(64) DEFAULT NULL" +
             ")";
-
     public static final String INSERT_USER_DML_SQL = "INSERT INTO users(name,password,email,phoneNumber) VALUES " +
-            "('A','******','a@gmail.com','1') , " +
-            "('B','******','b@gmail.com','2') , " +
-            "('C','******','c@gmail.com','3') , " +
-            "('D','******','d@gmail.com','4') , " +
-            "('E','******','e@gmail.com','5')";
+            "('A','111','a@gmail.com','1') , " +
+            "('B','222','b@gmail.com','2') , " +
+            "('C','333','c@gmail.com','3') , " +
+            "('D','444','d@gmail.com','4') , " +
+            "('E','555','e@gmail.com','5')";
+
+    // ========================= init statements end =========================
+
+    /** 初始化数据库 */
+    public static void initDB() throws Exception {
+
+        Connection connection = DriverManager.getConnection(DATABASE_URL);
+        Statement statement = connection.createStatement();
+
+        // 清除需要初始化的表
+        ResultSet resultSet = connection.getMetaData().getTables(null, null, null, new String[]{"TABLE"});
+        while (resultSet.next()) {
+            String tableName = resultSet.getString("TABLE_NAME");
+            System.out.println(tableName);
+            if (DEFAULT_TABLES.contains(tableName)) {
+                statement.execute(DROP_USERS_TABLE_DDL_SQL + tableName);
+            }
+        }
+
+        // 初始化表
+        statement.execute(CREATE_USERS_TABLE_DDL_SQL);
+        statement.execute(INSERT_USER_DML_SQL);
+
+        connection.close();
+    }
 
 
     public static void main(String[] args) throws Exception {
@@ -65,10 +90,16 @@ public class DBConnectionManager {
 
         Statement statement = connection.createStatement();
         // 删除 users 表
-        System.out.println(statement.execute(DROP_USERS_TABLE_DDL_SQL)); // false
+        System.out.println(statement.execute(DROP_USERS_TABLE_DDL_SQL + "USERS")); // false
         // 创建 users 表
         System.out.println(statement.execute(CREATE_USERS_TABLE_DDL_SQL)); // false
         System.out.println(statement.executeUpdate(INSERT_USER_DML_SQL));  // 5
+
+        ResultSet rs = connection.getMetaData().getTables(null, null, null, new String[]{"TABLE"});
+        while (rs.next()) {
+            String tableName = rs.getString("TABLE_NAME");
+            System.out.println("=======table name:" + tableName);
+        }
 
         // 执行查询语句（DML）
         ResultSet resultSet = statement.executeQuery("SELECT id,name,password,email,phoneNumber FROM users");
@@ -150,8 +181,13 @@ public class DBConnectionManager {
      */
     static Map<Class, String> typeMethodMappings = new HashMap<>();
 
+    /** 默认表 */
+    public static final Set<String> DEFAULT_TABLES = new HashSet<>();
+
     static {
         typeMethodMappings.put(Long.class, "getLong");
         typeMethodMappings.put(String.class, "getString");
+
+        DEFAULT_TABLES.add("USERS");
     }
 }

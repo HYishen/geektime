@@ -63,10 +63,9 @@ public class FrontControllerServlet extends HttpServlet {
                 Set<String> supportedHttpMethods = findSupportedHttpMethods(method);
                 Path pathFromMethod = method.getAnnotation(Path.class);
                 if (pathFromMethod != null) {
-                    requestPath += pathFromMethod.value();
+                    String methdoRequestPath = requestPath + pathFromMethod.value();
+                    handleMethodInfoMapping.put(methdoRequestPath, new HandlerMethodInfo(methdoRequestPath, method, supportedHttpMethods));
                 }
-                handleMethodInfoMapping.put(requestPath,
-                        new HandlerMethodInfo(requestPath, method, supportedHttpMethods));
             }
             controllersMapping.put(requestPath, controller);
         }
