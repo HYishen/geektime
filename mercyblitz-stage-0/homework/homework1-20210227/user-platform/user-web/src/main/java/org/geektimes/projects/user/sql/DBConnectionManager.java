@@ -41,7 +41,7 @@ public class DBConnectionManager {
             "id INT NOT NULL PRIMARY KEY GENERATED ALWAYS AS IDENTITY (START WITH 1, INCREMENT BY 1), " +
             "name VARCHAR(16) NOT NULL, " +
             "password VARCHAR(64) NOT NULL, " +
-            "email VARCHAR(64) DEFAULT NULL, " +
+            "email VARCHAR(64) NOT NULL, " +
             "phoneNumber VARCHAR(64) DEFAULT NULL" +
             ")";
     public static final String INSERT_USER_DML_SQL = "INSERT INTO users(name,password,email,phoneNumber) VALUES " +

@@ -65,9 +65,9 @@ public class FrontControllerServlet extends HttpServlet {
                 if (pathFromMethod != null) {
                     String methdoRequestPath = requestPath + pathFromMethod.value();
                     handleMethodInfoMapping.put(methdoRequestPath, new HandlerMethodInfo(methdoRequestPath, method, supportedHttpMethods));
+                    controllersMapping.put(methdoRequestPath, controller);
                 }
             }
-            controllersMapping.put(requestPath, controller);
         }
     }
 
@@ -117,6 +117,9 @@ public class FrontControllerServlet extends HttpServlet {
         // 映射到 Controller
         Controller controller = controllersMapping.get(requestMappingPath);
 
+        System.out.println("requestMappingPath: " + requestMappingPath);
+        System.out.println("controller: " + controller);
+
         if (controller != null) {
 
             HandlerMethodInfo handlerMethodInfo = handleMethodInfoMapping.get(requestMappingPath);
@@ -134,7 +137,9 @@ public class FrontControllerServlet extends HttpServlet {
 
                     if (controller instanceof PageController) {
                         PageController pageController = PageController.class.cast(controller);
-                        String viewPath = pageController.execute(request, response);
+                        System.out.println("method:"+handlerMethodInfo.getHandlerMethod());
+                        String viewPath = (String) handlerMethodInfo.getHandlerMethod().invoke(pageController, request, response);
+                        System.out.println("viewPath:"+viewPath);
                         // 页面请求 forward
                         // request -> RequestDispatcher forward
                         // RequestDispatcher requestDispatcher = request.getRequestDispatcher(viewPath);

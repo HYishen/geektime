@@ -46,6 +46,16 @@ public class InMemoryUserRepository implements UserRepository {
     }
 
     @Override
+    public User getUserByName(String name) {
+        return null;
+    }
+
+    @Override
+    public User getUserByEmail(String email) {
+        return null;
+    }
+
+    @Override
     public Collection<User> getAll() {
         return repository.values();
     }

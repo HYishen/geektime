@@ -13,6 +13,7 @@ public class DBConnectionInitializerListener implements ServletContextListener {
     public void contextInitialized(ServletContextEvent sce) {
         // 初始化数据库
         try {
+            System.out.println("-------------- 初始化数据库 --------------");
             DBConnectionManager.initDB();
         } catch (Exception e) {
             throw new RuntimeException(e.getCause());
