@@ -1,9 +1,12 @@
 package org.geektimes.projects.user.domain;
 
+import org.hibernate.validator.constraints.Length;
+
 import javax.persistence.*;
 import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Pattern;
 import java.io.Serializable;
 import java.util.Objects;
 
@@ -21,20 +24,21 @@ public class User implements Serializable {
     @Id
     @GeneratedValue(strategy = AUTO)
     @NotNull
+    @Min(0)
     private Long id;
 
     @Column
     private String name;
 
     @Column
-    @Max(32)
-    @Min(6)
+    @Length(min = 6, max = 32)
     private String password;
 
     @Column
     private String email;
 
     @Column
+    @Pattern(regexp = "^(130|131|132|133|134|135|136|137|138|139|150|151|152|153|155|156|157|158|159|180|186|187|188|189)\\d{8}$", message = "电话号码格式不正确")
     private String phoneNumber;
 
     public Long getId() {
